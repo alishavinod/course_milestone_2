@@ -1,0 +1,17 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Huddle</title><style>
+body{font:15px Arial;margin:0;background:#f5f5f5;color:#222}header{background:#4a154b;color:white;padding:18px;font-size:22px}
+main{max-width:900px;margin:30px auto;background:white;padding:25px;border-radius:8px}input,button{padding:10px;margin:4px}button{background:#007a5a;color:#fff;border:0;border-radius:4px}
+#app{display:none}.row{padding:8px;border-bottom:1px solid #ddd}.muted{color:#777}
+</style></head><body><header>Huddle</header><main>
+<section id="auth"><h2>Sign in</h2><form id="auth-form"><input name="username" placeholder="username" required><input name="password" type="password" placeholder="password" required><button id="auth-submit" type="submit">Login</button></form><p id="error"></p></section>
+<section id="app"><b id="current-user"></b> <button id="logout-btn">Logout</button><h2>Workspace</h2><form id="workspace-create-form"><input name="slug" placeholder="team-slug"><input name="name" placeholder="Team name"><button type="submit">Create</button></form><div id="channels"></div><h2 id="channel-title"></h2><div id="message-list"></div><form id="send"><input id="message-input" name="body"><button id="send-btn">Send</button></form></section>
+</main><script>
+let token=localStorage.getItem('huddle.token'),ch=null;
+const api=async(u,o={})=>{o.headers={...(o.headers||{}),Authorization:'Bearer '+token,'Content-Type':'application/json'};return fetch('/api'+u,o).then(x=>x.json())};
+async function load(){let x=await api('/workspaces');if(!x.workspaces?.length)return;let d=await api('/workspaces/'+x.workspaces[0].slug);document.getElementById('channels').innerHTML=d.channels.map(c=>`<button data-channel-id="${c.id}" data-channel-name="${c.name}" onclick="select(${c.id},'${c.name}')">#${c.name}</button>`).join('');select(d.channels[0].id,d.channels[0].name)}
+async function select(id,name){ch=id;document.getElementById('channel-title').textContent='#'+name;let x=await api('/channels/'+id+'/messages');document.getElementById('message-list').innerHTML=(x.messages||[]).reverse().map(m=>`<div class=row data-testid=message><b>${m.author.display_name}</b> <span class=muted>${m.created_at}</span><div data-testid=message-body>${m.body}</div></div>`).join('')}
+document.getElementById('auth-form').onsubmit=async e=>{e.preventDefault();let x=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(e.target)))});if(!x.ok){document.getElementById('error').textContent='Invalid login';return}let d=await x.json();token=d.token;localStorage.setItem('huddle.token',token);document.getElementById('auth').style.display='none';document.getElementById('app').style.display='block';document.getElementById('current-user').textContent=d.user.display_name;load()}
+document.getElementById('send').onsubmit=async e=>{e.preventDefault();await api('/channels/'+ch+'/messages',{method:'POST',body:JSON.stringify({body:document.getElementById('message-input').value})});document.getElementById('message-input').value='';select(ch,document.getElementById('channel-title').textContent.slice(1))}
+document.getElementById('logout-btn').onclick=()=>{localStorage.removeItem('huddle.token');location.reload()}
+if(token){document.getElementById('auth').style.display='none';document.getElementById('app').style.display='block';api('/auth/me').then(x=>{if(x.user){current-user.textContent=x.user.display_name;load()}})}
+</script></body></html>

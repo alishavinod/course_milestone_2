@@ -102,6 +102,10 @@ model:
     # reasoning is left off (block omitted). Pin OpenRouter routing to openai for
     # gpt-5.6-luna; no fallbacks so runs stay on one provider/quantization.
     extra_body:
+      # Changed configuration: with no reasoning setting, most first replies invented a whole session and
+      # submitted with an empty /app. "low" matches first replies on the direct OpenAI route.
+      reasoning:
+        effort: low
       provider:
         only:
           - openai

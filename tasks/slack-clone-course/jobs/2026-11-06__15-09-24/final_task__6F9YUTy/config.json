@@ -1,0 +1,19 @@
+{
+    "task": {
+        "path": "tasks/slack-clone-course/course-staff-files/final_task"
+    },
+    "trial_name": "final_task__6F9YUTy",
+    "trials_dir": "/Users/alishavinod/course_milestone_2/tasks/slack-clone-course/jobs/2026-11-06__15-09-24",
+    "agent": {
+        "name": "mini_swe_agent_local:MiniSweAgentLocal",
+        "model_name": "openai/gpt-5.6-luna",
+        "kwargs": {
+            "config_file": "/Users/alishavinod/course_milestone_2/tasks/slack-clone-course/course-staff-files/final_task/agent_llm_config/mswea-openai-gpt-5.6-luna-no-reasoning.yaml",
+            "cost_limit": 3
+        }
+    },
+    "verifier": {
+        "disable": true
+    },
+    "job_id": "9850c425-062d-4a8a-b95d-4dcf3b965be0"
+}
